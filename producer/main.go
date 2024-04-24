@@ -35,7 +35,7 @@ func producerHandler(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.
 
 		err := json.NewDecoder(req.Body).Decode(&m)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("Decode %s\n", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -43,7 +43,7 @@ func producerHandler(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.
 		topic := m.Type
 		value, err := json.Marshal(m)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("Marshal %s\n", err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
@@ -55,7 +55,7 @@ func producerHandler(kafkaWriter *kafka.Writer) func(http.ResponseWriter, *http.
 
 		err = kafkaWriter.WriteMessages(req.Context(), msg)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Printf("Write to kafka %s\n", err.Error())
 			w.Write([]byte(err.Error()))
 			log.Fatalln(err)
 		}
