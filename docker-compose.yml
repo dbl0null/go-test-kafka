@@ -55,7 +55,7 @@ services:
     build:
       context: simulator
     environment:
-      PRODUCER_URL: producer:8080
+      PRODUCER_URL: http://producer:8080//api/v1/runner/events
     depends_on:
       - kafka
     restart: always
