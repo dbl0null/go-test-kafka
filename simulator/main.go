@@ -95,12 +95,15 @@ func main() {
 		default:
 			message := createNewMessage()
 			buf, err := json.Marshal(message)
+			//fmt.Println(string(buf))
 			if err != nil {
 				log.Fatalln(err)
 			}
 			_, err = http.Post(producerURL, "application/json", bytes.NewBuffer(buf))
-
-			time.Sleep(time.Duration(10) * time.Second)
+			if err != nil {
+				fmt.Println(err)
+			}
+			time.Sleep(time.Duration(2) * time.Second)
 		}
 	}
 }
