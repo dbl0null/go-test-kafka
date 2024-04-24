@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -82,7 +81,7 @@ func createNewMessage() Message {
 }
 
 func main() {
-	producerURL := os.Getenv("PRODUCER_URL")
+	producerURL := fmt.Sprintf("http://%s/api/v1/runner/events", os.Getenv("PRODUCER_URL"))
 	//producerURL := "https://webhook.site/5067df51-dfd6-44c0-8447-e06e2d8c307b"
 
 	c := make(chan os.Signal, 1)
@@ -97,11 +96,11 @@ func main() {
 			buf, err := json.Marshal(message)
 			//fmt.Println(string(buf))
 			if err != nil {
-				log.Fatalln(err)
+				fmt.Printf("Marshal %s\n", err.Error())
 			}
 			_, err = http.Post(producerURL, "application/json", bytes.NewBuffer(buf))
 			if err != nil {
-				fmt.Println(err)
+				fmt.Printf("Post %s\n", err.Error())
 			}
 			time.Sleep(time.Duration(2) * time.Second)
 		}
