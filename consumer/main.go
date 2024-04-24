@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -26,22 +27,29 @@ func getKafkaReader(kafkaURL, topic, groupID string) *kafka.Reader {
 
 func readKafkaTopic(ctx context.Context, kafkaURL, groupID, topic string) {
 	reader := getKafkaReader(kafkaURL, topic, groupID)
-
 	defer reader.Close()
 
-	fmt.Printf("Consuming topic %s..\n", topic)
+	file, err := os.Create(fmt.Sprintf("consumer-%s.log", topic))
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	fmt.Printf("Consuming %s..\n", topic)
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Printf("Done topic %s\n", topic)
+			fmt.Printf("Done %s\n", topic)
 			return
 		default:
 			message, err := reader.ReadMessage(ctx)
 			if err != nil {
 				log.Fatalln(err)
 			}
-			// TODO: log to file
-			fmt.Printf("Message in topic %s: partition:%v offset:%v	%s = %s\n", message.Topic, message.Partition, message.Offset, string(message.Key), string(message.Value))
+
+			w := io.MultiWriter(os.Stdout, file)
+			logger := log.New(w, "logger", log.LstdFlags)
+			logger.Printf("Message in topic %s: partition:%v offset:%v	%s = %s\n", message.Topic, message.Partition, message.Offset, string(message.Key), string(message.Value))
 		}
 	}
 }
