@@ -83,6 +83,7 @@ func createNewMessage() Message {
 func main() {
 	producerURL := fmt.Sprintf("http://%s/api/v1/runner/events", os.Getenv("PRODUCER_URL"))
 	//producerURL := "https://webhook.site/5067df51-dfd6-44c0-8447-e06e2d8c307b"
+	fmt.Printf("Producer URL: %s\n", producerURL)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
